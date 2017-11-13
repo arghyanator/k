@@ -1,0 +1,26 @@
+global_defs {
+ router_id <%= node['hostname'] %>
+}
+vrrp_script haproxy {
+ script "killall -0 haproxy"
+ interval 2 # Check every 2 seconds
+ weight 2   # add 2 points of priority if OK
+}
+vrrp_instance 52 {
+ virtual_router_id 52
+ advert_int 1
+ # for electing MASTER, highest priority wins.
+ priority <%= @keepalived_node_priority %> # 101 on Master, 100 on backup
+ vrrp_unicast_bind <%= @nodeid_ip %>       # Internal IP of this machine
+ vrrp_unicast_peer <%= @peer_nodeid_ip %>  # Internal IP of peer
+ state MASTER
+
+interface <%= @keepalived_interface %>
+
+virtual_ipaddress {
+ <%= @keepalived_vip_ip %> dev <%= @keepalived_interface %>
+ }
+ track_script {
+ haproxy
+ }
+}

@@ -1,0 +1,9 @@
+frontend K8sMASTER-API-VIP
+  bind <%= @k8smaster_vip_ip %>:6443
+default_backend K8sMASTER-API-VIP-BACKEND
+backend K8sMASTER-API-VIP-BACKEND
+  balance  source
+  option  tcplog
+  server  <%= @k8smaster_nodeid1 %> <%= @k8smaster_nodeid1_ip %>:6443  check
+  server  <%= @k8smaster_nodeid2 %> <%= @k8smaster_nodeid2_ip %>:6443  check backup
+  server  <%= @k8smaster_nodeid3 %> <%= @k8smaster_nodeid3_ip %>:6443  check backup

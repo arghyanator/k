@@ -1,0 +1,10 @@
+{
+  "id": "K8sMaster_configs",
+  "nodeid1": "k8smaster1",
+  "nodeid2": "k8smaster2",
+  "nodeid3": "k8smaster3",
+  "nodeid1_ip": "192.168.56.231",
+  "nodeid2_ip": "192.168.56.232",
+  "nodeid3_ip": "192.168.56.233",
+  "vip_ip": "192.168.56.220"
+}
