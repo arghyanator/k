@@ -10,7 +10,7 @@ http://download.virtualbox.org/virtualbox/5.1.30/VirtualBox-5.1.30-118389-OSX.dm
 Install Vagrant:
 ----------------
 https://releases.hashicorp.com/vagrant/2.0.0/vagrant_2.0.0_x86_64.dmg
-
+ 
 
 Install Ubuntu/Xenial 16.04 Virtual VM using Vagrant:
 ------------------------------------------------------
