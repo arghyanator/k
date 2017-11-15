@@ -1,10 +1,10 @@
 #
-# Cookbook Name:: install_kubernetes_master
+# Cookbook Name:: install_kubernetes_master1
 # Recipe:: install_k8smaster
 #
 # Arghyanator
 #
-# This cookbook installs Kubernetes second and third master nodes on a 3-master Ubuntu 16.04 Kubernetes cluster
+# This cookbook installs Kubernetes master nodes on Ubuntu 16.04 platform
 # We want most steps to run during execute phase of chef-client run so everything is a ruby_block execute
 
 case node["platform"]
@@ -63,6 +63,116 @@ when "ubuntu"
         action :create
     end.run_action(:run)
 
+    ###ONLY RUN ON FIRST MASTER NODE
+    ###=============================
+    # Create the CA directory on the Host which is shared accross Vbox VMs
+    ##Delete any pre-existing CA directory first
+    directory '/master/share/CA' do
+        recursive true
+        action :delete
+    end
+    ##Now create the CA directory
+    %w{CA}.each do |dir|
+        directory "/master/share/#{dir}" do
+            mode '0755'
+            owner 'root'
+            group 'root'
+            action :create
+            recursive true
+        end
+    end
+
+    #Copy the JSON files required to create CA Certs to CA folder
+    cookbook_file '/master/share/CA/ca-config.json' do
+        source 'ca-config.json'
+        owner 'root'
+        group 'root'
+        mode '0644'
+        action :create
+    end
+    cookbook_file '/master/share/CA/ca-csr.json' do
+        source 'ca-csr.json'
+        owner 'root'
+        group 'root'
+        mode '0644'
+        action :create
+    end
+
+    #Create the CA CERT files 
+    ruby_block "Create CA Certs" do
+        block do
+            %x[cd /master/share/CA; /usr/local/bin/cfssl gencert -initca ca-csr.json | /usr/local/bin/cfssljson -bare ca]
+        end
+        action :run
+    end
+
+    # Create the Admin Certificate / Credentials folder on shared host folder (shared accross all K8s VMs)
+    ##Delete any pre-existing admin directory first
+    directory '/master/share/admin' do
+        recursive true
+        action :delete
+    end
+    ##Now create the admin directory
+    %w{admin}.each do |dir|
+        directory "/master/share/#{dir}" do
+            mode '0755'
+            owner 'root'
+            group 'root'
+            action :create
+            recursive true
+        end
+    end
+
+    #Copy the JSON files required to create Admin Certs to Admin folder
+    cookbook_file '/master/share/admin/admin-csr.json' do
+        source 'admin-csr.json'
+        owner 'root'
+        group 'root'
+        mode '0644'
+        action :create
+    end
+
+    #Create the Admin CERT files
+    ruby_block "Create Admin Certs" do
+        block do
+            %x[cd /master/share/admin; /usr/local/bin/cfssl gencert -ca=/master/share/CA/ca.pem -ca-key=/master/share/CA/ca-key.pem -config=/master/share/CA/ca-config.json -profile=kubernetes-argh admin-csr.json | /usr/local/bin/cfssljson -bare admin]
+        end
+        action :run
+    end
+
+    # Create the Kube-Proxy Certificate folder on shared host folder (shared accross all K8s VMs)
+    ##Delete any pre-existing proxy directory first
+    directory '/master/share/proxy' do
+        recursive true
+        action :delete
+    end
+    ##Now create the proxy directory
+    %w{proxy}.each do |dir|
+        directory "/master/share/#{dir}" do
+            mode '0755'
+            owner 'root'
+            group 'root'
+            action :create
+            recursive true
+        end
+    end
+    #Copy the JSON files required to create Kube-Proxy Certs to Proxy folder
+    cookbook_file '/master/share/proxy/kube-proxy-csr.json' do
+        source 'kube-proxy-csr.json'
+        owner 'root'
+        group 'root'
+        mode '0644'
+        action :create
+    end
+    #Create the Kube-proxy CERT files
+    ruby_block "Create Kube-Proxy Certs" do
+        block do
+            %x[cd /master/share/proxy; /usr/local/bin/cfssl gencert -ca=/master/share/CA/ca.pem -ca-key=/master/share/CA/ca-key.pem -config=/master/share/CA/ca-config.json -profile=kubernetes-argh kube-proxy-csr.json | /usr/local/bin/cfssljson -bare kube-proxy]
+        end
+        action :run
+    end
+
+    #Set up Kubernetes API Certs
     ##Get Kubernetes API VIP information from Chef data bag
     ##Get kubernetes Master nodes info from Chef Data bag
     k8smaster_info = Chef::DataBagItem.load("kubernetes", "K8sMaster_configs")
@@ -76,7 +186,46 @@ when "ubuntu"
     etcd1_ip = k8smaster_info["etcd1"]
     etcd2_ip = k8smaster_info["etcd2"]
     etcd3_ip = k8smaster_info["etcd3"]
+    ##Delete any pre-existing API directory first
+    directory '/master/share/API' do
+        recursive true
+        action :delete
+    end
+    ##Now create the API directory
+    %w{API}.each do |dir|
+        directory "/master/share/#{dir}" do
+            mode '0755'
+            owner 'root'
+            group 'root'
+            action :create
+            recursive true
+        end
+    end
+    #Copy the JSON files required to create API Certs to API folder
+    cookbook_file '/master/share/API/kubernetes-csr.json' do
+        source 'kubernetes-csr.json'
+        owner 'root'
+        group 'root'
+        mode '0644'
+        action :create
+    end
+    #Create the API CERT files
+    ruby_block "Create API Certs" do
+        block do
+            %x[cd /master/share/API; /usr/local/bin/cfssl gencert -ca=/master/share/CA/ca.pem -ca-key=/master/share/CA/ca-key.pem -config=/master/share/CA/ca-config.json -hostname=#{k8smaster_nodeid1},#{k8smaster_nodeid2},#{k8smaster_nodeid3},#{k8smaster_nodeid1_ip},#{k8smaster_nodeid2_ip},#{k8smaster_nodeid3_ip},#{k8smaster_vip_ip},127.0.0.1,kubernetes.default -profile=kubernetes-argh kubernetes-csr.json | /usr/local/bin/cfssljson -bare kubernetes]
+        end
+        action :run
+    end
     
+    # copy the encryption config yaml 
+    cookbook_file '/master/share/CA/encryption-config.yaml' do
+        source 'encryption-config.yaml'
+        owner 'root'
+        group 'root'
+        mode '0644'
+        action :create
+    end
+
     #Bootstrap Kubernetes master nodes
     ##Install Kubernetes controller binaries
     remote_file "/usr/local/bin/kube-apiserver" do

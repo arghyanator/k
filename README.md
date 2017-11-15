@@ -3,6 +3,12 @@ Kubernetes cluster on VirtualBox and Vagrant
 
 Spin up VirtualBox VM and install Etcd, haproxy and Kubernetes using Chef and Vagrant
 
+__Reference:__ https://github.com/kelseyhightower/kubernetes-the-hard-way
+
+But...I made it the really really Hard Way...
+
+__Min Host Requirements:__ 16GB of RAM (good luck trying it with 8GB!!!)
+
 Install Virtual Box on MAC:
 ---------------------------
 http://download.virtualbox.org/virtualbox/5.1.30/VirtualBox-5.1.30-118389-OSX.dmg
@@ -48,7 +54,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     etcd1.vm.hostname = "etcd1"
     etcd1.vm.network :private_network, ip: "192.168.56.201"
     etcd1.vm.provider "virtualbox" do |v|
-      v.customize ["modifyvm", :id, "--memory", "512"]
+      v.customize ["modifyvm", :id, "--memory", "256"]
       v.customize ["modifyvm", :id, "--cpus", "1"]
       v.customize ["modifyvm", :id, "--ioapic", "on"]
       v.customize ["modifyvm", :id, "--ostype", "Ubuntu_64"]
@@ -68,7 +74,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     etcd2.vm.hostname = "etcd2"
     etcd2.vm.network :private_network, ip: "192.168.56.202"
     etcd2.vm.provider "virtualbox" do |v|
-      v.customize ["modifyvm", :id, "--memory", "512"]
+      v.customize ["modifyvm", :id, "--memory", "256"]
       v.customize ["modifyvm", :id, "--cpus", "1"]
       v.customize ["modifyvm", :id, "--ioapic", "on"]
       v.customize ["modifyvm", :id, "--ostype", "Ubuntu_64"]
@@ -88,7 +94,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     etcd3.vm.hostname = "etcd3"
     etcd3.vm.network :private_network, ip: "192.168.56.203"
     etcd3.vm.provider "virtualbox" do |v|
-      v.customize ["modifyvm", :id, "--memory", "512"]
+      v.customize ["modifyvm", :id, "--memory", "256"]
       v.customize ["modifyvm", :id, "--cpus", "1"]
       v.customize ["modifyvm", :id, "--ioapic", "on"]
       v.customize ["modifyvm", :id, "--ostype", "Ubuntu_64"]
@@ -108,7 +114,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     haproxy1.vm.hostname = "haproxy1"
     haproxy1.vm.network :private_network, ip: "192.168.56.211"
     haproxy1.vm.provider "virtualbox" do |v|
-      v.customize ["modifyvm", :id, "--memory", "512"]
+      v.customize ["modifyvm", :id, "--memory", "256"]
       v.customize ["modifyvm", :id, "--cpus", "1"]
       v.customize ["modifyvm", :id, "--ioapic", "on"]
       v.customize ["modifyvm", :id, "--ostype", "Ubuntu_64"]
@@ -129,7 +135,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     haproxy2.vm.hostname = "haproxy2"
     haproxy2.vm.network :private_network, ip: "192.168.56.212"
     haproxy2.vm.provider "virtualbox" do |v|
-      v.customize ["modifyvm", :id, "--memory", "512"]
+      v.customize ["modifyvm", :id, "--memory", "256"]
       v.customize ["modifyvm", :id, "--cpus", "1"]
       v.customize ["modifyvm", :id, "--ioapic", "on"]
       v.customize ["modifyvm", :id, "--ostype", "Ubuntu_64"]
@@ -150,7 +156,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     k8smaster1.vm.hostname = "k8smaster1"
     k8smaster1.vm.network :private_network, ip: "192.168.56.231"
     k8smaster1.vm.provider "virtualbox" do |v|
-      v.customize ["modifyvm", :id, "--memory", "512"]
+      v.customize ["modifyvm", :id, "--memory", "1536"]
       v.customize ["modifyvm", :id, "--cpus", "1"]
       v.customize ["modifyvm", :id, "--ioapic", "on"]
       v.customize ["modifyvm", :id, "--ostype", "Ubuntu_64"]
@@ -164,7 +170,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       chef.data_bags_path = "data_bags"
       chef.nodes_path = "cookbooks/nodes"
   
-      chef.add_recipe "install_kubernetes_master"
+      chef.add_recipe "install_kubernetes_master1"
   
     end
   end
@@ -173,7 +179,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     k8smaster2.vm.hostname = "k8smaster2"
     k8smaster2.vm.network :private_network, ip: "192.168.56.232"
     k8smaster2.vm.provider "virtualbox" do |v|
-      v.customize ["modifyvm", :id, "--memory", "512"]
+      v.customize ["modifyvm", :id, "--memory", "1536"]
       v.customize ["modifyvm", :id, "--cpus", "1"]
       v.customize ["modifyvm", :id, "--ioapic", "on"]
       v.customize ["modifyvm", :id, "--ostype", "Ubuntu_64"]
@@ -196,7 +202,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     k8smaster3.vm.hostname = "k8smaster3"
     k8smaster3.vm.network :private_network, ip: "192.168.56.233"
     k8smaster3.vm.provider "virtualbox" do |v|
-      v.customize ["modifyvm", :id, "--memory", "512"]
+      v.customize ["modifyvm", :id, "--memory", "1536"]
       v.customize ["modifyvm", :id, "--cpus", "1"]
       v.customize ["modifyvm", :id, "--ioapic", "on"]
       v.customize ["modifyvm", :id, "--ostype", "Ubuntu_64"]
@@ -243,15 +249,24 @@ end
  
 Boot up VMs and Install software using Vagrant
 -----------------------------------------------
+__Note__: Dont forget to create the nodes folder in which Vagrant will create the chef node JSONs
+```
+$ mkdir cookbooks/nodes
+```
+
+__Also,__ create the Data Encryption Key and using that key create the encryption-config.yaml file for master install cookbook
+```
+$ head -c 32 /dev/urandom | base64 
+```
+Finally...
 ```
 $ vagrant up 
 ```
-
 Chef configuration
 ------------------
 ```
 $ tree cookbooks/
-cookbooks
+cookbooks/
 ├── install_etcd
 │   ├── files
 │   │   └── check_etcd.sh
@@ -274,6 +289,7 @@ cookbooks
 │   │   ├── admin-csr.json
 │   │   ├── ca-config.json
 │   │   ├── ca-csr.json
+│   │   ├── encryption-config.yaml
 │   │   ├── kube-proxy-csr.json
 │   │   └── kubernetes-csr.json
 │   ├── recipes
@@ -281,7 +297,27 @@ cookbooks
 │   │   └── install_k8smaster.rb
 │   └── templates
 │       ├── encryption-config.erb
-│       └── k8sworker-crs.erb
+│       ├── k8sworker-crs.erb
+│       ├── kube-apiserver.erb
+│       ├── kube-controller-manager.erb
+│       └── kube-scheduler.erb
+├── install_kubernetes_master1
+│   ├── files
+│   │   ├── admin-csr.json
+│   │   ├── ca-config.json
+│   │   ├── ca-csr.json
+│   │   ├── encryption-config.yaml
+│   │   ├── kube-proxy-csr.json
+│   │   └── kubernetes-csr.json
+│   ├── recipes
+│   │   ├── default.rb
+│   │   └── install_k8smaster.rb
+│   └── templates
+│       ├── encryption-config.erb
+│       ├── k8sworker-crs.erb
+│       ├── kube-apiserver.erb
+│       ├── kube-controller-manager.erb
+│       └── kube-scheduler.erb
 ├── install_kubernetes_slave
 │   ├── files
 │   ├── recipes
@@ -296,6 +332,8 @@ cookbooks
     ├── haproxy1.json
     ├── haproxy2.json
     ├── k8smaster1.json
+    ├── k8smaster2.json
+    ├── k8smaster3.json
     └── k8sslave1.json
 
 $ tree data_bags/
