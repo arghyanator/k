@@ -246,7 +246,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 end
 
 ```
- 
+
+Create the VirtualBox HostOnly Network for VMs
+----------------------------------------------
+![HostOnly_network](https://github.com/arghyanator/k/blob/master/HostOnly_networks.png)
+![HostOnly_network_subnet](https://github.com/arghyanator/k/blob/master/HostOnly_networks_subnet.png)
+
 Boot up VMs and Install software using Vagrant
 -----------------------------------------------
 __Note__: Dont forget to create the nodes folder in which Vagrant will create the chef node JSONs and master_share folder which is mounted on all VMs to share files.
