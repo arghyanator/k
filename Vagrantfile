@@ -12,7 +12,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     etcd1.vm.hostname = "etcd1"
     etcd1.vm.network :private_network, ip: "192.168.56.201"
     etcd1.vm.provider "virtualbox" do |v|
-      v.customize ["modifyvm", :id, "--memory", "256"]
+      v.customize ["modifyvm", :id, "--memory", "512"]
       v.customize ["modifyvm", :id, "--cpus", "1"]
       v.customize ["modifyvm", :id, "--ioapic", "on"]
       v.customize ["modifyvm", :id, "--ostype", "Ubuntu_64"]
@@ -42,7 +42,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     etcd2.vm.hostname = "etcd2"
     etcd2.vm.network :private_network, ip: "192.168.56.202"
     etcd2.vm.provider "virtualbox" do |v|
-      v.customize ["modifyvm", :id, "--memory", "256"]
+      v.customize ["modifyvm", :id, "--memory", "512"]
       v.customize ["modifyvm", :id, "--cpus", "1"]
       v.customize ["modifyvm", :id, "--ioapic", "on"]
       v.customize ["modifyvm", :id, "--ostype", "Ubuntu_64"]
@@ -72,7 +72,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     etcd3.vm.hostname = "etcd3"
     etcd3.vm.network :private_network, ip: "192.168.56.203"
     etcd3.vm.provider "virtualbox" do |v|
-      v.customize ["modifyvm", :id, "--memory", "256"]
+      v.customize ["modifyvm", :id, "--memory", "512"]
       v.customize ["modifyvm", :id, "--cpus", "1"]
       v.customize ["modifyvm", :id, "--ioapic", "on"]
       v.customize ["modifyvm", :id, "--ostype", "Ubuntu_64"]
@@ -105,7 +105,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     haproxy1.vm.hostname = "haproxy1"
     haproxy1.vm.network :private_network, ip: "192.168.56.211"
     haproxy1.vm.provider "virtualbox" do |v|
-      v.customize ["modifyvm", :id, "--memory", "256"]
+      v.customize ["modifyvm", :id, "--memory", "512"]
       v.customize ["modifyvm", :id, "--cpus", "1"]
       v.customize ["modifyvm", :id, "--ioapic", "on"]
       v.customize ["modifyvm", :id, "--ostype", "Ubuntu_64"]
@@ -135,7 +135,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     haproxy2.vm.hostname = "haproxy2"
     haproxy2.vm.network :private_network, ip: "192.168.56.212"
     haproxy2.vm.provider "virtualbox" do |v|
-      v.customize ["modifyvm", :id, "--memory", "256"]
+      v.customize ["modifyvm", :id, "--memory", "512"]
       v.customize ["modifyvm", :id, "--cpus", "1"]
       v.customize ["modifyvm", :id, "--ioapic", "on"]
       v.customize ["modifyvm", :id, "--ostype", "Ubuntu_64"]
@@ -167,7 +167,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     k8smaster1.vm.hostname = "k8smaster1"
     k8smaster1.vm.network :private_network, ip: "192.168.56.231"
     k8smaster1.vm.provider "virtualbox" do |v|
-      v.customize ["modifyvm", :id, "--memory", "1536"]
+      v.customize ["modifyvm", :id, "--memory", "2048"]
       v.customize ["modifyvm", :id, "--cpus", "1"]
       v.customize ["modifyvm", :id, "--ioapic", "on"]
       v.customize ["modifyvm", :id, "--ostype", "Ubuntu_64"]
@@ -200,7 +200,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     k8smaster2.vm.hostname = "k8smaster2"
     k8smaster2.vm.network :private_network, ip: "192.168.56.232"
     k8smaster2.vm.provider "virtualbox" do |v|
-      v.customize ["modifyvm", :id, "--memory", "1536"]
+      v.customize ["modifyvm", :id, "--memory", "2048"]
       v.customize ["modifyvm", :id, "--cpus", "1"]
       v.customize ["modifyvm", :id, "--ioapic", "on"]
       v.customize ["modifyvm", :id, "--ostype", "Ubuntu_64"]
@@ -233,7 +233,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     k8smaster3.vm.hostname = "k8smaster3"
     k8smaster3.vm.network :private_network, ip: "192.168.56.233"
     k8smaster3.vm.provider "virtualbox" do |v|
-      v.customize ["modifyvm", :id, "--memory", "1536"]
+      v.customize ["modifyvm", :id, "--memory", "2048"]
       v.customize ["modifyvm", :id, "--cpus", "1"]
       v.customize ["modifyvm", :id, "--ioapic", "on"]
       v.customize ["modifyvm", :id, "--ostype", "Ubuntu_64"]
@@ -269,7 +269,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     k8sslave1.vm.hostname = "k8sslave1"
     k8sslave1.vm.network :private_network, ip: "192.168.56.235"
     k8sslave1.vm.provider "virtualbox" do |v|
-      v.customize ["modifyvm", :id, "--memory", "512"]
+      v.customize ["modifyvm", :id, "--memory", "2048"]
       v.customize ["modifyvm", :id, "--cpus", "1"]
       v.customize ["modifyvm", :id, "--ioapic", "on"]
       v.customize ["modifyvm", :id, "--ostype", "Ubuntu_64"]

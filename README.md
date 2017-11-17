@@ -249,9 +249,10 @@ end
  
 Boot up VMs and Install software using Vagrant
 -----------------------------------------------
-__Note__: Dont forget to create the nodes folder in which Vagrant will create the chef node JSONs
+__Note__: Dont forget to create the nodes folder in which Vagrant will create the chef node JSONs and master_share folder which is mounted on all VMs to share files.
 ```
 $ mkdir cookbooks/nodes
+$ mkdir master_share
 ```
 
 __Also,__ create the Data Encryption Key and using that key create the encryption-config.yaml file for master install cookbook

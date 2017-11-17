@@ -132,5 +132,58 @@ when "ubuntu"
         EOH
         flags "-x"
     end
+
+    ##Install Worker software
+    package %w(socat)  do
+        action :nothing
+    end
+
+    ##Make the required folders
+    ###First Delete if old data or folder exists
+    %w(/etc/cni/net.d /opt/cni/bin /var/lib/kubelet /var/lib/kube-proxy /var/lib/kubernetes /var/run/kubernetes).each do |dir|
+        directory "#{dir}" do
+            recursive true
+            action :delete
+        end
+    end
+    ##Then create the directories
+    %w{/etc/cni/net.d /opt/cni/bin /var/lib/kubelet /var/lib/kube-proxy /var/lib/kubernetes /var/run/kubernetes}.each do |dir|
+        directory "#{dir}" do
+            mode '0755'
+            owner 'root'
+            group 'root'
+            action :create
+            recursive true
+        end
+    end
+
+    ##Download the software
+    %w(https://github.com/containernetworking/plugins/releases/download/v0.6.0/cni-plugins-amd64-v0.6.0.tgz https://github.com/kubernetes-incubator/cri-containerd/releases/download/v1.0.0-alpha.0/cri-containerd-1.0.0-alpha.0.tar.gz).each do |remfile|
+        remote_file '/tmp' do
+            source "#{remfile}"
+            owner 'root'
+            group 'root'
+            mode '0644'
+            action :create
+        end
+    end
+
+    ruby_block "extract CNI plugins" do
+        block do
+            %x[tar -xvf /tmp/cni-plugins-amd64-v0.6.0.tgz -C /opt/cni/bin/]
+            %x[tar -xvf /tmp/cri-containerd-1.0.0-alpha.0.tar.gz -C /]
+        end
+        action :run
+    end
+
+    %w(https://storage.googleapis.com/kubernetes-release/release/v1.8.0/bin/linux/amd64/kubectl https://storage.googleapis.com/kubernetes-release/release/v1.8.0/bin/linux/amd64/kube-proxy https://storage.googleapis.com/kubernetes-release/release/v1.8.0/bin/linux/amd64/kubelet).each do |remfile|
+        remote_file '/usr/local/bin' do
+            source "#{remfile}"
+            owner 'root'
+            group 'root'
+            mode '0755'
+            action :create
+        end
+    end
 end
 
