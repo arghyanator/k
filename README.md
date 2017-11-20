@@ -54,15 +54,18 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     etcd1.vm.hostname = "etcd1"
     etcd1.vm.network :private_network, ip: "192.168.56.201"
     etcd1.vm.provider "virtualbox" do |v|
-      v.customize ["modifyvm", :id, "--memory", "256"]
+      v.customize ["modifyvm", :id, "--memory", "512"]
       v.customize ["modifyvm", :id, "--cpus", "1"]
       v.customize ["modifyvm", :id, "--ioapic", "on"]
       v.customize ["modifyvm", :id, "--ostype", "Ubuntu_64"]
       v.gui = true
     end
+    etcd1.vm.synced_folder ".", "/vagrant", disabled: true
+    etcd1.vm.synced_folder "./master_share", "/master/share"
     etcd1.vm.provision "shell", inline: "curl -L https://omnitruck.chef.io/install.sh | sudo bash -s -- -v 13.2.20"
     etcd1.vm.provision "chef_zero" do |chef|
       chef.cookbooks_path = "cookbooks"
+      chef.data_bags_path = "data_bags"
       chef.nodes_path = "cookbooks/nodes"
   
       chef.add_recipe "install_etcd"
@@ -74,15 +77,18 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     etcd2.vm.hostname = "etcd2"
     etcd2.vm.network :private_network, ip: "192.168.56.202"
     etcd2.vm.provider "virtualbox" do |v|
-      v.customize ["modifyvm", :id, "--memory", "256"]
+      v.customize ["modifyvm", :id, "--memory", "512"]
       v.customize ["modifyvm", :id, "--cpus", "1"]
       v.customize ["modifyvm", :id, "--ioapic", "on"]
       v.customize ["modifyvm", :id, "--ostype", "Ubuntu_64"]
       v.gui = true
     end
+    etcd2.vm.synced_folder ".", "/vagrant", disabled: true
+    etcd2.vm.synced_folder "./master_share", "/master/share"
     etcd2.vm.provision "shell", inline: "curl -L https://omnitruck.chef.io/install.sh | sudo bash -s -- -v 13.2.20"
     etcd2.vm.provision "chef_zero" do |chef|
       chef.cookbooks_path = "cookbooks"
+      chef.data_bags_path = "data_bags"
       chef.nodes_path = "cookbooks/nodes"
   
       chef.add_recipe "install_etcd"
@@ -94,15 +100,18 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     etcd3.vm.hostname = "etcd3"
     etcd3.vm.network :private_network, ip: "192.168.56.203"
     etcd3.vm.provider "virtualbox" do |v|
-      v.customize ["modifyvm", :id, "--memory", "256"]
+      v.customize ["modifyvm", :id, "--memory", "512"]
       v.customize ["modifyvm", :id, "--cpus", "1"]
       v.customize ["modifyvm", :id, "--ioapic", "on"]
       v.customize ["modifyvm", :id, "--ostype", "Ubuntu_64"]
       v.gui = true
     end
+    etcd3.vm.synced_folder ".", "/vagrant", disabled: true
+    etcd3.vm.synced_folder "./master_share", "/master/share"
     etcd3.vm.provision "shell", inline: "curl -L https://omnitruck.chef.io/install.sh | sudo bash -s -- -v 13.2.20"
     etcd3.vm.provision "chef_zero" do |chef|
       chef.cookbooks_path = "cookbooks"
+      chef.data_bags_path = "data_bags"
       chef.nodes_path = "cookbooks/nodes"
   
       chef.add_recipe "install_etcd"
@@ -114,7 +123,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     haproxy1.vm.hostname = "haproxy1"
     haproxy1.vm.network :private_network, ip: "192.168.56.211"
     haproxy1.vm.provider "virtualbox" do |v|
-      v.customize ["modifyvm", :id, "--memory", "256"]
+      v.customize ["modifyvm", :id, "--memory", "512"]
       v.customize ["modifyvm", :id, "--cpus", "1"]
       v.customize ["modifyvm", :id, "--ioapic", "on"]
       v.customize ["modifyvm", :id, "--ostype", "Ubuntu_64"]
@@ -135,7 +144,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     haproxy2.vm.hostname = "haproxy2"
     haproxy2.vm.network :private_network, ip: "192.168.56.212"
     haproxy2.vm.provider "virtualbox" do |v|
-      v.customize ["modifyvm", :id, "--memory", "256"]
+      v.customize ["modifyvm", :id, "--memory", "512"]
       v.customize ["modifyvm", :id, "--cpus", "1"]
       v.customize ["modifyvm", :id, "--ioapic", "on"]
       v.customize ["modifyvm", :id, "--ostype", "Ubuntu_64"]
@@ -156,7 +165,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     k8smaster1.vm.hostname = "k8smaster1"
     k8smaster1.vm.network :private_network, ip: "192.168.56.231"
     k8smaster1.vm.provider "virtualbox" do |v|
-      v.customize ["modifyvm", :id, "--memory", "1536"]
+      v.customize ["modifyvm", :id, "--memory", "2048"]
       v.customize ["modifyvm", :id, "--cpus", "1"]
       v.customize ["modifyvm", :id, "--ioapic", "on"]
       v.customize ["modifyvm", :id, "--ostype", "Ubuntu_64"]
@@ -170,7 +179,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       chef.data_bags_path = "data_bags"
       chef.nodes_path = "cookbooks/nodes"
   
-      chef.add_recipe "install_kubernetes_master1"
+      chef.add_recipe "install_kubernetes_master"
   
     end
   end
@@ -179,7 +188,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     k8smaster2.vm.hostname = "k8smaster2"
     k8smaster2.vm.network :private_network, ip: "192.168.56.232"
     k8smaster2.vm.provider "virtualbox" do |v|
-      v.customize ["modifyvm", :id, "--memory", "1536"]
+      v.customize ["modifyvm", :id, "--memory", "2048"]
       v.customize ["modifyvm", :id, "--cpus", "1"]
       v.customize ["modifyvm", :id, "--ioapic", "on"]
       v.customize ["modifyvm", :id, "--ostype", "Ubuntu_64"]
@@ -202,7 +211,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     k8smaster3.vm.hostname = "k8smaster3"
     k8smaster3.vm.network :private_network, ip: "192.168.56.233"
     k8smaster3.vm.provider "virtualbox" do |v|
-      v.customize ["modifyvm", :id, "--memory", "1536"]
+      v.customize ["modifyvm", :id, "--memory", "2048"]
       v.customize ["modifyvm", :id, "--cpus", "1"]
       v.customize ["modifyvm", :id, "--ioapic", "on"]
       v.customize ["modifyvm", :id, "--ostype", "Ubuntu_64"]
@@ -225,7 +234,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     k8sslave1.vm.hostname = "k8sslave1"
     k8sslave1.vm.network :private_network, ip: "192.168.56.235"
     k8sslave1.vm.provider "virtualbox" do |v|
-      v.customize ["modifyvm", :id, "--memory", "512"]
+      v.customize ["modifyvm", :id, "--memory", "2048"]
       v.customize ["modifyvm", :id, "--cpus", "1"]
       v.customize ["modifyvm", :id, "--ioapic", "on"]
       v.customize ["modifyvm", :id, "--ostype", "Ubuntu_64"]
@@ -244,6 +253,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
   end
 end
+
 
 ```
 
@@ -275,11 +285,17 @@ $ tree cookbooks/
 cookbooks/
 ├── install_etcd
 │   ├── files
-│   │   └── check_etcd.sh
+│   │   ├── ca-config.json
+│   │   ├── ca-csr.json
+│   │   ├── check_etcd.sh
+│   │   └── kubernetes-csr.json
 │   ├── recipes
-│   │   └── default.rb
+│   │   ├── default.rb
+│   │   ├── install_ca_etcd_k8s.rb
+│   │   └── install_etcd.rb
 │   └── templates
-│       └── etcd_conf.erb
+│       ├── etcd_conf.erb
+│       └── etcd_service.erb
 ├── install_haproxy_keepalived
 │   ├── files
 │   │   ├── haproxy
@@ -293,28 +309,10 @@ cookbooks/
 ├── install_kubernetes_master
 │   ├── files
 │   │   ├── admin-csr.json
-│   │   ├── ca-config.json
-│   │   ├── ca-csr.json
 │   │   ├── encryption-config.yaml
 │   │   ├── kube-proxy-csr.json
-│   │   └── kubernetes-csr.json
-│   ├── recipes
-│   │   ├── default.rb
-│   │   └── install_k8smaster.rb
-│   └── templates
-│       ├── encryption-config.erb
-│       ├── k8sworker-crs.erb
-│       ├── kube-apiserver.erb
-│       ├── kube-controller-manager.erb
-│       └── kube-scheduler.erb
-├── install_kubernetes_master1
-│   ├── files
-│   │   ├── admin-csr.json
-│   │   ├── ca-config.json
-│   │   ├── ca-csr.json
-│   │   ├── encryption-config.yaml
-│   │   ├── kube-proxy-csr.json
-│   │   └── kubernetes-csr.json
+│   │   ├── rbac.authorization.k8s.io.yaml
+│   │   └── rbac.authorization.k8s.yaml
 │   ├── recipes
 │   │   ├── default.rb
 │   │   └── install_k8smaster.rb
@@ -325,7 +323,6 @@ cookbooks/
 │       ├── kube-controller-manager.erb
 │       └── kube-scheduler.erb
 ├── install_kubernetes_slave
-│   ├── files
 │   ├── recipes
 │   │   ├── default.rb
 │   │   └── install_k8sslave.rb
