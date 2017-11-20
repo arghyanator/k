@@ -1,0 +1,28 @@
+[Unit]
+Description=etcd
+Documentation=https://github.com/coreos
+
+[Service]
+ExecStart=/usr/local/bin/etcd \
+  --name <%= @etcdhostname %> \
+  --cert-file=/etc/etcd/kubernetes.pem \
+  --key-file=/etc/etcd/kubernetes-key.pem \
+  --peer-cert-file=/etc/etcd/kubernetes.pem \
+  --peer-key-file=/etc/etcd/kubernetes-key.pem \
+  --trusted-ca-file=/etc/etcd/ca.pem \
+  --peer-trusted-ca-file=/etc/etcd/ca.pem \
+  --peer-client-cert-auth \
+  --client-cert-auth \
+  --initial-advertise-peer-urls https://<%= @etcdipaddress %>:2380 \
+  --listen-peer-urls https://<%= @etcdipaddress %>:2380,http://127.0.0.1:2380 \
+  --listen-client-urls https://<%= @etcdipaddress %>:2379,http://127.0.0.1:2379 \
+  --advertise-client-urls https://<%= @etcdipaddress %>:2379 \
+  --initial-cluster-token vboxetcdcluster \
+  --initial-cluster etcd1=https://192.168.56.201:2380,etcd2=https://192.168.56.202:2380,etcd3=https://192.168.56.203:2380 \
+  --initial-cluster-state new \
+  --data-dir=/var/lib/etcd
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

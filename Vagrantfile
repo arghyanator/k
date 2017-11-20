@@ -18,6 +18,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       v.customize ["modifyvm", :id, "--ostype", "Ubuntu_64"]
       v.gui = true
     end
+    # Disable the default /vagrant folder in VBox VMs
+    etcd1.vm.synced_folder ".", "/vagrant", disabled: true
+    # Create our own Synced Folder
+    etcd1.vm.synced_folder "./master_share", "/master/share"
     # config.vm.synced_folder "vagrant/chef-repo", "/home/ubuntu/chef-repo"
     # Install Chef-client inside Vbox guest VM
     etcd1.vm.provision "shell", inline: "curl -L https://omnitruck.chef.io/install.sh | sudo bash -s -- -v 13.2.20"
@@ -25,7 +29,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     etcd1.vm.provision "chef_zero" do |chef|
       # Specify the local paths where Chef data is stored
       chef.cookbooks_path = "cookbooks"
-      #chef.data_bags_path = "data_bags"
+      chef.data_bags_path = "data_bags"
       chef.nodes_path = "cookbooks/nodes"
       #chef.roles_path = "roles"
   
@@ -48,6 +52,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       v.customize ["modifyvm", :id, "--ostype", "Ubuntu_64"]
       v.gui = true
     end
+    # Disable the default /vagrant folder in VBox VMs
+    etcd2.vm.synced_folder ".", "/vagrant", disabled: true
+    # Create our own Synced Folder
+    etcd2.vm.synced_folder "./master_share", "/master/share"
     # config.vm.synced_folder "vagrant/chef-repo", "/home/ubuntu/chef-repo"
     # Install Chef-client inside Vbox guest VM
     etcd2.vm.provision "shell", inline: "curl -L https://omnitruck.chef.io/install.sh | sudo bash -s -- -v 13.2.20"
@@ -55,7 +63,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     etcd2.vm.provision "chef_zero" do |chef|
       # Specify the local paths where Chef data is stored
       chef.cookbooks_path = "cookbooks"
-      #chef.data_bags_path = "data_bags"
+      chef.data_bags_path = "data_bags"
       chef.nodes_path = "cookbooks/nodes"
       #chef.roles_path = "roles"
   
@@ -78,6 +86,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       v.customize ["modifyvm", :id, "--ostype", "Ubuntu_64"]
       v.gui = true
     end
+    # Disable the default /vagrant folder in VBox VMs
+    etcd3.vm.synced_folder ".", "/vagrant", disabled: true
+    # Create our own Synced Folder
+    etcd3.vm.synced_folder "./master_share", "/master/share"
     # config.vm.synced_folder "vagrant/chef-repo", "/home/ubuntu/chef-repo"
     # Install Chef-client inside Vbox guest VM
     etcd3.vm.provision "shell", inline: "curl -L https://omnitruck.chef.io/install.sh | sudo bash -s -- -v 13.2.20"
@@ -85,7 +97,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     etcd3.vm.provision "chef_zero" do |chef|
       # Specify the local paths where Chef data is stored
       chef.cookbooks_path = "cookbooks"
-      #chef.data_bags_path = "data_bags"
+      chef.data_bags_path = "data_bags"
       chef.nodes_path = "cookbooks/nodes"
       #chef.roles_path = "roles"
   
@@ -189,7 +201,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       #chef.roles_path = "roles"
   
       # Add a recipe
-      chef.add_recipe "install_kubernetes_master1"
+      chef.add_recipe "install_kubernetes_master"
   
       # Or maybe a role
       #chef.add_role "web"
