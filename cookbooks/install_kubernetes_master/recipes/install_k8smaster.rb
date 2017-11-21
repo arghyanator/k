@@ -49,6 +49,21 @@ when "ubuntu"
         action :run
     end
 
+    ##Get Kubernetes API VIP information from Chef data bag
+    ##Get kubernetes Master nodes info from Chef Data bag
+    k8smaster_info = Chef::DataBagItem.load("kubernetes", "K8sMaster_configs")
+    k8smaster_nodeid1 = k8smaster_info["nodeid1"]
+    k8smaster_nodeid2 = k8smaster_info["nodeid2"]
+    k8smaster_nodeid3 = k8smaster_info["nodeid3"]
+    k8smaster_nodeid1_ip = k8smaster_info["nodeid1_ip"]
+    k8smaster_nodeid2_ip = k8smaster_info["nodeid2_ip"]
+    k8smaster_nodeid3_ip = k8smaster_info["nodeid3_ip"]
+    k8smaster_vip_ip = k8smaster_info["vip_ip"]
+    etcd1_ip = k8smaster_info["etcd1"]
+    etcd2_ip = k8smaster_info["etcd2"]
+    etcd3_ip = k8smaster_info["etcd3"]
+
+
     # Set Node Hostname and IP address variables using ruby block
     ruby_block "sethostandip" do
         block do
@@ -132,7 +147,17 @@ when "ubuntu"
             end
             action :run
         end
-    
+
+        #Create the Kube-Proxy config files on shared folder
+        ruby_block "Create Kube-Proxy Config files" do
+            block do
+                %x[cd /master/share/proxy; /usr/local/bin/kubectl config set-cluster kubernetes-argh --certificate-authority=/master/share/CA/ca.pem --embed-certs=true --server=https://#{k8smaster_vip_ip}:6443 --kubeconfig=kube-proxy.kubeconfig]
+                %x[cd /master/share/proxy; /usr/local/bin/kubectl config set-credentials kube-proxy --client-certificate=/master/share/proxy/kube-proxy.pem --client-key=/master/share/proxy/kube-proxy-key.pem --embed-certs=true --kubeconfig=kube-proxy.kubeconfig]
+                %x[cd /master/share/proxy; /usr/local/bin/kubectl config set-context default --cluster=kubernetes-argh --user=kube-proxy  --kubeconfig=kube-proxy.kubeconfig]
+            end
+            action :run
+        end
+
         # copy the encryption config yaml 
         cookbook_file '/master/share/CA/encryption-config.yaml' do
             source 'encryption-config.yaml'
@@ -199,19 +224,6 @@ when "ubuntu"
         action :run
     end
 
-    ##Get Kubernetes API VIP information from Chef data bag
-    ##Get kubernetes Master nodes info from Chef Data bag
-    k8smaster_info = Chef::DataBagItem.load("kubernetes", "K8sMaster_configs")
-    k8smaster_nodeid1 = k8smaster_info["nodeid1"]
-    k8smaster_nodeid2 = k8smaster_info["nodeid2"]
-    k8smaster_nodeid3 = k8smaster_info["nodeid3"]
-    k8smaster_nodeid1_ip = k8smaster_info["nodeid1_ip"]
-    k8smaster_nodeid2_ip = k8smaster_info["nodeid2_ip"]
-    k8smaster_nodeid3_ip = k8smaster_info["nodeid3_ip"]
-    k8smaster_vip_ip = k8smaster_info["vip_ip"]
-    etcd1_ip = k8smaster_info["etcd1"]
-    etcd2_ip = k8smaster_info["etcd2"]
-    etcd3_ip = k8smaster_info["etcd3"]
 
     ##Create API server systemd file   
     template '/etc/systemd/system/kube-apiserver.service' do
@@ -262,7 +274,6 @@ when "ubuntu"
             %x[systemctl disable firewalld;systemctl stop firewalld;iptables -P FORWARD ACCEPT]
             %x[ufw allow 8080]
             %x[ufw allow 6443]
-
         end
         action :run
     end
@@ -275,6 +286,14 @@ when "ubuntu"
             action [ :enable, :start ]
             #retries 3
         end
+    end
+
+    ##Set kube-proxy config usage
+    ruby_block "Set Kube-proxy cluster config" do
+        block do
+            %x[/usr/local/bin/kubectl config use-context default --kubeconfig=/master/share/proxy/kube-proxy.kubeconfig]
+        end
+        action :run
     end
     
 end
