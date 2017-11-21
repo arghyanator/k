@@ -323,11 +323,16 @@ cookbooks/
 │       ├── kube-controller-manager.erb
 │       └── kube-scheduler.erb
 ├── install_kubernetes_slave
+│   ├── files
+│   │   ├── 99-loopback.conf
+│   │   └── kube-proxy.service
 │   ├── recipes
 │   │   ├── default.rb
 │   │   └── install_k8sslave.rb
 │   └── templates
-│       └── k8sworker-csr.erb
+│       ├── 10-bridge.erb
+│       ├── k8sworker-csr.erb
+│       └── kubelet_service.erb
 └── nodes
     ├── etcd1.json
     ├── etcd2.json
